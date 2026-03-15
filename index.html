@@ -998,6 +998,7 @@
     const GAMMA_BASE = 'https://gamma-api.polymarket.com/markets';
     const DATA_BASE = 'https://data-api.polymarket.com';
     const CLOB_BASE = 'https://clob.polymarket.com';
+    const ALLORIGINS_PROXY = 'https://api.allorigins.win/raw?url=';
     const MARKET_LIMIT = 100;
     const REFRESH_INTERVAL = 120000; // 2 minutes
 
@@ -1727,18 +1728,33 @@
     }
 
     /* Order Book */
+    async function fetchClobApi(endpoint) {
+      // Try direct first (CLOB API supports CORS from browser origins)
+      try {
+        const res = await fetch(`${CLOB_BASE}${endpoint}`);
+        if (res.ok) return await res.json();
+      } catch (e) { console.log('Direct CLOB failed, trying proxy:', e.message); }
+      // Fallback: allorigins proxy
+      try {
+        const res = await fetch(ALLORIGINS_PROXY + encodeURIComponent(`${CLOB_BASE}${endpoint}`));
+        if (res.ok) return await res.json();
+      } catch (e) { console.log('allorigins failed, trying corsproxy:', e.message); }
+      // Fallback: corsproxy
+      const res = await fetch(GAMMA_PROXY + encodeURIComponent(`${CLOB_BASE}${endpoint}`));
+      if (!res.ok) throw new Error(`CLOB fetch failed: ${res.status}`);
+      return await res.json();
+    }
+
     async function loadOrderBook(m) {
       const container = document.getElementById('orderbookContent');
       if (!m.clobTokenIds || m.clobTokenIds.length === 0) {
-        container.innerHTML = '<div class="detail-loading">暂无订单簿数据</div>';
+        container.innerHTML = '<div class="detail-loading">暂无订单簿数据（clobTokenIds缺失）</div>';
         return;
       }
 
       try {
         const tokenId = m.clobTokenIds[0];
-        const url = GAMMA_PROXY + encodeURIComponent(`${CLOB_BASE}/book?token_id=${tokenId}`);
-        const res = await fetch(url);
-        const book = await res.json();
+        const book = await fetchClobApi(`/book?token_id=${tokenId}`);
 
         const bids = (book.bids || []).slice(0, 10);
         const asks = (book.asks || []).slice(0, 10);
@@ -1812,11 +1828,9 @@
       try {
         const tokenId = m.clobTokenIds[0];
         const fidelity = interval === '1d' ? 5 : interval === '1w' ? 30 : interval === '1m' ? 60 : 360;
-        const url = GAMMA_PROXY + encodeURIComponent(
-          `${CLOB_BASE}/prices-history?market=${tokenId}&interval=${interval}&fidelity=${fidelity}`
+        const data = await fetchClobApi(
+          `/prices-history?market=${tokenId}&interval=${interval}&fidelity=${fidelity}`
         );
-        const res = await fetch(url);
-        const data = await res.json();
         const history = data.history || [];
 
         if (history.length < 2) {
