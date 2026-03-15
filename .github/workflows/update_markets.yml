@@ -1,16 +1,18 @@
-name: Update Markets Data
+name: Update Markets & Deploy
 
 on:
   schedule:
-    # 每 30 分钟更新一次（GitHub Actions 免费版够用）
+    # 每 30 分钟更新一次
     - cron: '*/30 * * * *'
+  push:
+    branches: [main]
   workflow_dispatch: # 支持手动触发
 
 permissions:
   contents: write
 
 jobs:
-  update:
+  update-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -20,7 +22,6 @@ jobs:
         run: |
           echo "[$(date)] 开始更新 markets.json ..."
 
-          # 拉取 API 数据
           HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/raw_markets.json \
             -H "User-Agent: Mozilla/5.0 (Polymarket-Radar-Bot)" \
             --connect-timeout 10 \
@@ -28,19 +29,20 @@ jobs:
             "https://gamma-api.polymarket.com/markets?active=true&closed=false&limit=100&order=volume24hr&ascending=false")
 
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "❌ API 请求失败，HTTP $HTTP_CODE"
-            exit 1
+            echo "⚠️ API 请求失败 HTTP $HTTP_CODE，使用现有 markets.json"
+          else
+            if python3 -c "import json; d=json.load(open('/tmp/raw_markets.json')); assert len(d)>0" 2>/dev/null; then
+              echo "✅ API 数据拉取成功"
+            else
+              echo "⚠️ 返回数据无效，使用现有 markets.json"
+              HTTP_CODE="INVALID"
+            fi
           fi
 
-          # 验证 JSON 有效性
-          if ! python3 -c "import json; d=json.load(open('/tmp/raw_markets.json')); assert len(d)>0" 2>/dev/null; then
-            echo "❌ 返回数据无效或为空"
-            exit 1
-          fi
+          echo "HTTP_CODE=$HTTP_CODE" >> $GITHUB_ENV
 
-          echo "✅ API 数据拉取成功"
-
-      - name: Process and update markets.json
+      - name: Process markets.json
+        if: env.HTTP_CODE == '200'
         run: |
           python3 -c "
           import json
@@ -97,11 +99,18 @@ jobs:
           print(f'✅ 已更新 {len(markets)} 个市场')
           "
 
-      - name: Commit and push
+      - name: Commit updated data
+        if: env.HTTP_CODE == '200'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add markets.json
-          # 只在有变化时才 commit
           git diff --cached --quiet || git commit -m "🔄 Auto-update markets.json [$(date -u '+%Y-%m-%d %H:%M UTC')]"
           git push
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy . --project-name polymarket-radar-pages --branch main --commit-dirty=true
