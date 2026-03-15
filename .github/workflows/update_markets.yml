@@ -84,6 +84,10 @@ jobs:
                   'volume24hr': vol,
                   'volume1wk': m.get('volume1wk', 0) or 0,
                   'liquidityNum': m.get('liquidityNum', 0) or 0,
+                  'clobTokenIds': m.get('clobTokenIds', '[]'),
+                  'conditionId': m.get('conditionId', ''),
+                  'image': evt.get('image', '') or evt.get('icon', '') or '',
+                  'description': (evt.get('description', '') or '')[:500],
               })
 
           data = {
