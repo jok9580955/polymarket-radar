@@ -908,71 +908,60 @@
       if (!q) return '—';
       let cn = q;
 
-      // Key phrase translations (order matters - longer phrases first)
-      const phrases = [
-        // Common patterns
-        [/Will (.+?) win the (\d{4}) (.+?) presidential nomination/i, '$1 会赢得 $2 年$3总统提名吗'],
-        [/Will (.+?) win the (\d{4}) (.+?) [Pp]residential [Ee]lection/i, '$1 会赢得 $2 年$3总统大选吗'],
-        [/Will (.+?) win the (\d{4}) US Presidential Election/i, '$1 会赢得 $2 年美国总统大选吗'],
-        [/Will the Fed (increase|decrease|cut|raise|hold|maintain) interest rates? by (\d+)\+? bps/i, (m, action, bps) => {
-          const acts = {increase:'加息',decrease:'降息',cut:'降息',raise:'加息',hold:'维持利率',maintain:'维持利率'};
-          return `美联储会${acts[action.toLowerCase()]||action} ${bps} 个基点吗`;
-        }],
-        [/Will the Fed (increase|decrease|cut|raise|hold|maintain) interest rates/i, (m, action) => {
-          const acts = {increase:'加息',decrease:'降息',cut:'降息',raise:'加息',hold:'维持利率不变',maintain:'维持利率不变'};
-          return `美联储会${acts[action.toLowerCase()]||action}吗`;
-        }],
-        [/Fed decision in (\w+)/i, '$1 美联储利率决议'],
-        [/Will (.+?) be the next (.+)/i, '$1 会成为下一任 $2 吗'],
-        [/Will (.+?) win (.+)/i, '$1 会赢得 $2 吗'],
-        [/Will (.+?) happen by (.+)/i, '$1 会在 $2 前发生吗'],
-        [/Will (.+?) before (.+)/i, '$1 会在 $2 之前吗'],
-        [/Will (.+?) by (.+)/i, '$1 会在 $2 之前吗'],
-        [/Will (.+?) on (.+)/i, '$1 会在 $2 吗'],
-        [/Will (.+?) in (\d{4})/i, '$1 会在 $2 年吗'],
-        [/Will there be a (.+)/i, '会有 $1 吗'],
-        [/Will (.+?)\?/i, '$1 会发生吗'],
-        [/Will (.+)/i, '$1 会发生吗'],
-      ];
-
-      // Word-level translations
+      // Word-level translations (applied FIRST so phrase patterns get Chinese words)
       const words = [
+        // Multi-word phrases first (order matters)
+        ['Elon Musk', '马斯克'], ['North Korea', '朝鲜'],
+        ['interest rate', '利率'], ['interest rates', '利率'],
+        ['trade war', '贸易战'], ['stock market', '股市'],
+        ['S&P 500', '标普500'], ['Federal Reserve', '美联储'],
+        ['the Fed', '美联储'], ['rate cut', '降息'], ['rate hike', '加息'],
+        ['artificial intelligence', '人工智能'],
+        ['Supreme Court', '最高法院'],
+        ['Super Bowl', '超级碗'], ['World Cup', '世界杯'],
+        ['Champions League', '欧冠'], ['Premier League', '英超'],
+        ['after the', '在'], ['before the', '在...之前'],
+        ['out by', '下台截止'], ['out of', '退出'],
         // People
         ['Trump', '特朗普'], ['Biden', '拜登'], ['Obama', '奥巴马'],
-        ['Elon Musk', '马斯克'], ['Musk', '马斯克'],
-        ['Netanyahu', '内塔尼亚胡'], ['Zelensky', '泽连斯基'], ['Putin', '普京'],
+        ['Musk', '马斯克'], ['Netanyahu', '内塔尼亚胡'],
+        ['Zelensky', '泽连斯基'], ['Putin', '普京'],
         ['Xi Jinping', '习近平'], ['Macron', '马克龙'],
         ['DeSantis', '德桑蒂斯'], ['Haley', '黑利'], ['Vance', '万斯'],
         ['Newsom', '纽森'], ['Harris', '哈里斯'], ['Pence', '彭斯'],
+        ['Byron Donalds', '拜伦·唐纳兹'], ['Glenn Youngkin', '格伦·扬金'],
+        ['Andrew Yang', '杨安泽'], ['Ted Cruz', '特德·克鲁兹'],
+        ['Vivek Ramaswamy', '维韦克·拉马斯瓦米'],
+        ['JD Vance', '万斯'], ['Ron DeSantis', '德桑蒂斯'],
+        ['Nikki Haley', '妮基·黑利'], ['Marco Rubio', '马可·卢比奥'],
+        ['Josh Shapiro', '乔希·夏皮罗'],
         // Politics
         ['Republican', '共和党'], ['Democratic', '民主党'], ['Democrat', '民主党'],
         ['Congress', '国会'], ['Senate', '参议院'], ['House', '众议院'],
-        ['Supreme Court', '最高法院'], ['President', '总统'],
-        ['presidential', '总统'], ['election', '选举'], ['nominee', '候选人'],
-        ['nomination', '提名'], ['inauguration', '就职'],
-        ['impeach', '弹劾'], ['resign', '辞职'],
+        ['President', '总统'], ['presidential', '总统的'],
+        ['Presidential', '总统'], ['Election', '选举'], ['election', '选举'],
+        ['Nominee', '候选人'], ['nominee', '候选人'], ['nomination', '提名'],
+        ['inauguration', '就职'], ['impeach', '弹劾'], ['resign', '辞职'],
         // Geopolitics
         ['ceasefire', '停火'], ['war', '战争'], ['invasion', '入侵'],
         ['strike', '打击'], ['attack', '袭击'], ['military', '军事'],
         ['sanctions', '制裁'], ['nuclear', '核'], ['missile', '导弹'],
         ['Israel', '以色列'], ['Palestine', '巴勒斯坦'], ['Gaza', '加沙'],
         ['Iran', '伊朗'], ['Ukraine', '乌克兰'], ['Russia', '俄罗斯'],
-        ['China', '中国'], ['Taiwan', '台湾'], ['North Korea', '朝鲜'],
+        ['China', '中国'], ['Taiwan', '台湾'],
         ['NATO', '北约'], ['UN', '联合国'],
         // Economics
-        ['interest rate', '利率'], ['inflation', '通胀'], ['recession', '衰退'],
-        ['GDP', 'GDP'], ['tariff', '关税'], ['trade war', '贸易战'],
-        ['stock market', '股市'], ['S&P 500', '标普500'], ['Nasdaq', '纳斯达克'],
-        ['Federal Reserve', '美联储'], ['the Fed', '美联储'], ['FOMC', '美联储公开市场委员会'],
-        ['rate cut', '降息'], ['rate hike', '加息'],
-        ['Treasury', '国债'], ['CPI', '消费者物价指数'],
+        ['inflation', '通胀'], ['recession', '衰退'], ['tariff', '关税'],
+        ['tariffs', '关税'], ['Treasury', '国债'], ['CPI', 'CPI'],
+        ['GDP', 'GDP'], ['FOMC', '美联储'],
+        ['increase', '提高'], ['decrease', '降低'],
+        ['bps', '基点'], ['meeting', '会议'],
         // Crypto
         ['Bitcoin', '比特币'], ['BTC', '比特币'], ['Ethereum', '以太坊'],
         ['ETH', '以太坊'], ['Solana', 'Solana'], ['crypto', '加密货币'],
         // Tech
-        ['AI', '人工智能'], ['artificial intelligence', '人工智能'],
-        ['OpenAI', 'OpenAI'], ['ChatGPT', 'ChatGPT'],
-        ['Apple', '苹果'], ['Google', '谷歌'], ['Meta', 'Meta'],
+        ['AI', 'AI'], ['OpenAI', 'OpenAI'], ['ChatGPT', 'ChatGPT'],
+        ['Apple', '苹果公司'], ['Google', '谷歌'], ['Meta', 'Meta'],
         ['TikTok', 'TikTok'], ['Twitter', '推特'],
         // Time
         ['January', '1月'], ['February', '2月'], ['March', '3月'],
@@ -981,29 +970,87 @@
         ['October', '10月'], ['November', '11月'], ['December', '12月'],
         // Sports
         ['NBA', 'NBA'], ['NFL', 'NFL'], ['MLB', 'MLB'],
-        ['Super Bowl', '超级碗'], ['World Cup', '世界杯'],
-        ['Champions League', '欧冠'], ['Premier League', '英超'],
-        ['Masters', '高尔夫大师赛'], ['UFC', 'UFC'],
+        ['Masters', '大师赛'], ['UFC', 'UFC'],
+        // Common words
+        ['win', '赢得'], ['the', ''], ['will', '会'],
+        ['by', '在...之前'], ['on', '在'], ['in', '在'],
+        ['and', '和'], ['or', '或'], ['not', '不'],
+        ['US', '美国'], ['United States', '美国'],
       ];
 
-      // Try phrase patterns first
-      for (const [pattern, replacement] of phrases) {
+      // Full sentence pattern translations (try these first)
+      const fullPatterns = [
+        [/^Will the Fed (increase|decrease|cut|raise|hold|maintain) interest rates? by (\d+)\+? bps after the (\w+) (\d{4}) meeting\??$/i, (m, action, bps, month, year) => {
+          const acts = {increase:'加息',decrease:'降息',cut:'降息',raise:'加息',hold:'维持利率',maintain:'维持利率'};
+          const months = {January:'1月',February:'2月',March:'3月',April:'4月',May:'5月',June:'6月',July:'7月',August:'8月',September:'9月',October:'10月',November:'11月',December:'12月'};
+          return `${year}年${months[month]||month}会议后，美联储${acts[action.toLowerCase()]||action}${bps}个基点吗？`;
+        }],
+        [/^Will the Fed (increase|decrease|cut|raise|hold|maintain) interest rates? by (\d+)\+? bps/i, (m, action, bps) => {
+          const acts = {increase:'加息',decrease:'降息',cut:'降息',raise:'加息',hold:'维持利率',maintain:'维持利率'};
+          return `美联储会${acts[action.toLowerCase()]||action}${bps}个基点吗？`;
+        }],
+        [/^Will the Fed (increase|decrease|cut|raise|hold|maintain) interest rates/i, (m, action) => {
+          const acts = {increase:'加息',decrease:'降息',cut:'降息',raise:'加息',hold:'维持利率不变',maintain:'维持利率不变'};
+          return `美联储会${acts[action.toLowerCase()]||action}吗？`;
+        }],
+        [/^(.+?) out by (\w+) (\d+)\??$/i, (m, who, month, day) => {
+          const months = {January:'1月',February:'2月',March:'3月',April:'4月',May:'5月',June:'6月',July:'7月',August:'8月',September:'9月',October:'10月',November:'11月',December:'12月'};
+          // Translate name
+          let name = who;
+          for (const [en, zh] of words) { if (who.toLowerCase() === en.toLowerCase()) { name = zh; break; } }
+          return `${name}会在${months[month]||month}${day}日前下台吗？`;
+        }],
+        [/^Will (.+?) strike (.+?) on (\w+) (\d+)\??$/i, (m, attacker, target, month, day) => {
+          const months = {January:'1月',February:'2月',March:'3月',April:'4月',May:'5月',June:'6月',July:'7月',August:'8月',September:'9月',October:'10月',November:'11月',December:'12月'};
+          let a = attacker, t = target;
+          for (const [en, zh] of words) { if (attacker.toLowerCase() === en.toLowerCase()) a = zh; if (target.toLowerCase() === en.toLowerCase()) t = zh; }
+          return `${a}会在${months[month]||month}${day}日打击${t}吗？`;
+        }],
+        [/^Will (.+?) win the (\d{4}) (.+?) presidential nomination\??$/i, (m, who, year, party) => {
+          let name = who, p = party;
+          for (const [en, zh] of words) { if (who.toLowerCase() === en.toLowerCase()) name = zh; if (party.toLowerCase() === en.toLowerCase()) p = zh; }
+          return `${name}会赢得${year}年${p}总统提名吗？`;
+        }],
+        [/^Will (.+?) win the (\d{4}) (.+?) [Pp]residential [Ee]lection\??$/i, (m, who, year, desc) => {
+          let name = who;
+          for (const [en, zh] of words) { if (who.toLowerCase() === en.toLowerCase()) name = zh; }
+          return `${name}会赢得${year}年美国总统大选吗？`;
+        }],
+        [/^Presidential [Ee]lection [Ww]inner (\d{4})\??$/i, (m, year) => `${year}年总统大选赢家`],
+        [/^(.+?) [Pp]residential [Nn]omin\w* (\d{4})\??$/i, (m, party, year) => {
+          let p = party;
+          for (const [en, zh] of words) { if (party.toLowerCase() === en.toLowerCase()) p = zh; }
+          return `${year}年${p}总统候选人`;
+        }],
+        [/^Fed decision in (\w+)\??$/i, (m, month) => {
+          const months = {January:'1月',February:'2月',March:'3月',April:'4月',May:'5月',June:'6月',July:'7月',August:'8月',September:'9月',October:'10月',November:'11月',December:'12月'};
+          return `${months[month]||month}美联储利率决议`;
+        }],
+      ];
+
+      // Try full sentence patterns first
+      for (const [pattern, replacement] of fullPatterns) {
         if (pattern.test(cn)) {
           cn = cn.replace(pattern, replacement);
-          break;
+          // Clean and return
+          cn = cn.replace(/\s+/g, ' ').trim();
+          return cn;
         }
       }
 
-      // Apply word-level translations
+      // Fallback: apply word replacements for partial translation
       for (const [en, zh] of words) {
-        const regex = new RegExp(en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        if (!zh || zh === en) continue;
+        const regex = new RegExp('\\b' + en.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\b', 'gi');
         cn = cn.replace(regex, zh);
       }
 
       // Clean up
-      cn = cn.replace(/\?$/, '').replace(/\s+/g, ' ').trim();
+      cn = cn.replace(/\?$/, '').replace(/\s+/g, ' ').replace(/\s*\.\.\.\s*/g, '…').trim();
+      // Remove stray 'the', 'a', 'an' etc that are now orphaned
+      cn = cn.replace(/\b(the|a|an)\b/gi, '').replace(/\s+/g, ' ').trim();
 
-      // If translation is same as original, return original
+      // If barely changed, return null
       if (cn === q.replace(/\?$/, '').trim()) return null;
       return cn;
     }
