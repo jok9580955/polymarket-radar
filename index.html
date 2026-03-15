@@ -717,6 +717,153 @@
         display: none;
       }
     }
+
+    /* ── Detail Page Overlay ── */
+    .detail-overlay {
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.85);
+      z-index: 1000;
+      display: none;
+      overflow-y: auto;
+      backdrop-filter: blur(12px);
+    }
+    .detail-overlay.active { display: flex; justify-content: center; }
+    .detail-panel {
+      width: 100%; max-width: 900px;
+      padding: 32px 28px;
+      animation: slideUp 0.3s ease;
+    }
+    @keyframes slideUp { from { opacity:0; transform:translateY(30px); } to { opacity:1; transform:translateY(0); } }
+    .detail-back {
+      color: var(--accent-cyan); cursor: pointer; font-size: 14px;
+      margin-bottom: 16px; display: inline-flex; align-items: center; gap: 6px;
+      background: none; border: none; font-family: inherit;
+      transition: opacity 0.2s;
+    }
+    .detail-back:hover { opacity: 0.7; }
+    .detail-header {
+      display: flex; gap: 20px; margin-bottom: 24px; align-items: flex-start;
+    }
+    .detail-img {
+      width: 80px; height: 80px; border-radius: 16px;
+      object-fit: cover; flex-shrink: 0;
+      border: 2px solid var(--border);
+    }
+    .detail-info { flex: 1; }
+    .detail-title-cn {
+      font-size: 22px; font-weight: 700; line-height: 1.3;
+      margin-bottom: 4px;
+    }
+    .detail-title-en {
+      font-size: 13px; color: var(--text-secondary); margin-bottom: 12px;
+    }
+    .detail-meta {
+      display: flex; flex-wrap: wrap; gap: 10px;
+    }
+    .detail-badge {
+      background: var(--bg-card); border: 1px solid var(--border);
+      padding: 6px 14px; border-radius: 10px;
+      font-size: 12px; display: flex; flex-direction: column; align-items: center;
+    }
+    .detail-badge .label { color: var(--text-secondary); font-size: 10px; margin-bottom: 2px; }
+    .detail-badge .val { font-weight: 700; font-size: 16px; }
+    .detail-badge .val.green { color: var(--green); }
+    .detail-badge .val.red { color: var(--red); }
+    .detail-badge .val.cyan { color: var(--accent-cyan); }
+
+    .detail-section {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 20px; margin-bottom: 16px;
+    }
+    .detail-section-title {
+      font-size: 14px; font-weight: 700; color: var(--accent-cyan);
+      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Chart */
+    .chart-container {
+      width: 100%; height: 260px; position: relative;
+    }
+    .chart-container canvas { width: 100% !important; height: 100% !important; }
+    .chart-interval-btns {
+      display: flex; gap: 6px; margin-bottom: 10px;
+    }
+    .chart-interval-btns button {
+      background: var(--bg-secondary); color: var(--text-secondary);
+      border: 1px solid var(--border); border-radius: 6px;
+      padding: 4px 12px; font-size: 11px; cursor: pointer; font-family: inherit;
+      transition: all 0.2s;
+    }
+    .chart-interval-btns button.active,
+    .chart-interval-btns button:hover {
+      background: var(--accent-cyan); color: #000; border-color: var(--accent-cyan);
+    }
+
+    /* Order Book */
+    .orderbook-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    .ob-side-title {
+      font-size: 12px; font-weight: 700; margin-bottom: 8px;
+      padding-bottom: 6px; border-bottom: 1px solid var(--border);
+    }
+    .ob-side-title.bids { color: var(--green); }
+    .ob-side-title.asks { color: var(--red); }
+    .ob-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 3px 0; font-size: 12px; position: relative;
+    }
+    .ob-row .ob-bar {
+      position: absolute; top: 0; bottom: 0; opacity: 0.08;
+      border-radius: 3px;
+    }
+    .ob-row.bid .ob-bar { background: var(--green); right: 0; }
+    .ob-row.ask .ob-bar { background: var(--red); left: 0; }
+    .ob-price { font-weight: 600; z-index: 1; }
+    .ob-size { color: var(--text-secondary); z-index: 1; }
+    .ob-row.bid .ob-price { color: var(--green); }
+    .ob-row.ask .ob-price { color: var(--red); }
+
+    /* Description */
+    .detail-desc {
+      font-size: 13px; line-height: 1.7; color: var(--text-secondary);
+      max-height: 200px; overflow-y: auto;
+    }
+    .detail-desc::-webkit-scrollbar { width: 4px; }
+    .detail-desc::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+    .detail-actions {
+      display: flex; gap: 10px; margin-top: 16px;
+    }
+    .detail-btn {
+      padding: 10px 24px; border-radius: 10px; font-size: 13px;
+      font-weight: 600; cursor: pointer; font-family: inherit;
+      border: none; transition: all 0.2s;
+    }
+    .detail-btn.primary {
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+      color: #fff;
+    }
+    .detail-btn.primary:hover { opacity: 0.85; }
+    .detail-btn.secondary {
+      background: var(--bg-card); color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+    .detail-btn.secondary:hover { border-color: var(--accent-cyan); }
+
+    .detail-loading {
+      text-align: center; padding: 40px; color: var(--text-secondary);
+    }
+    .market-link { color: var(--text-primary); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+    .market-link:hover { color: var(--accent-cyan); }
+
+    @media (max-width: 600px) {
+      .detail-panel { padding: 16px; }
+      .detail-header { flex-direction: column; }
+      .detail-img { width: 60px; height: 60px; }
+      .orderbook-grid { grid-template-columns: 1fr; }
+      .chart-container { height: 200px; }
+    }
   </style>
 </head>
 
@@ -838,6 +985,11 @@
     </footer>
   </div>
 
+  <!-- Detail Overlay -->
+  <div class="detail-overlay" id="detailOverlay">
+    <div class="detail-panel" id="detailPanel"></div>
+  </div>
+
   <script>
     /* ==========================
        CONFIG
@@ -845,6 +997,7 @@
     const GAMMA_PROXY = 'https://corsproxy.io/?url=';
     const GAMMA_BASE = 'https://gamma-api.polymarket.com/markets';
     const DATA_BASE = 'https://data-api.polymarket.com';
+    const CLOB_BASE = 'https://clob.polymarket.com';
     const MARKET_LIMIT = 100;
     const REFRESH_INTERVAL = 120000; // 2 minutes
 
@@ -931,6 +1084,12 @@
           const slug = m.slug || '';
           const eventSlug = (m.events && m.events[0]) ? m.events[0].slug : (m.eventSlug || slug);
 
+          const evt = (m.events && m.events[0]) || {};
+          let clobTokenIds = [];
+          try { clobTokenIds = JSON.parse(m.clobTokenIds || '[]'); } catch {}
+          let outcomes = [];
+          try { outcomes = JSON.parse(m.outcomes || '[]'); } catch {}
+
           return {
             id: m.id,
             question: m.question || m.groupItemTitle || '—',
@@ -951,7 +1110,12 @@
             liquidityNum: m.liquidityNum || 0,
             createdAt: m.createdAt || '',
             sentimentScore,
-            image: m.icon || m.image || ''
+            image: evt.image || evt.icon || m.icon || m.image || '',
+            conditionId: m.conditionId || '',
+            clobTokenIds,
+            outcomes,
+            description: evt.description || '',
+            outcomePrices: m.outcomePrices || '[]'
           };
         })
         .sort((a, b) => b.sentimentScore - a.sentimentScore);
@@ -1123,9 +1287,10 @@
       tbody.innerHTML = list.map(m => {
         const probPct = (m.yesPrice * 100).toFixed(1);
         const probColor = getProbColor(m.yesPrice);
+        const idx = allMarkets.indexOf(m);
         return `<tr>
-          <td style="max-width:300px;">
-            <a href="${m.url}" target="_blank" title="${m.question}">${bilingualText(m.question, 50, 55)}</a>
+          <td style="max-width:300px;cursor:pointer;" onclick="showDetail(${idx})">
+            <span class="market-link" title="${m.question}">${bilingualText(m.question, 50, 55)}</span>
           </td>
           <td><span class="tag">${m.category}</span></td>
           <td class="hide-mobile">${formatDateShort(m.endDate)}</td>
@@ -1196,12 +1361,13 @@
         el.innerHTML = '<li class="opp-empty">暂无符合条件的市场</li>';
         return;
       }
-      el.innerHTML = items.map(m =>
-        `<li>
-          <span class="opp-name"><a href="${m.url}" target="_blank" title="${m.question}">${bilingualText(m.question, 35, 42)}</a></span>
+      el.innerHTML = items.map(m => {
+        const idx = allMarkets.indexOf(m);
+        return `<li>
+          <span class="opp-name" onclick="showDetail(${idx})" style="cursor:pointer;"><span class="market-link" title="${m.question}">${bilingualText(m.question, 35, 42)}</span></span>
           <span class="opp-meta">${metaFn(m)}</span>
-        </li>`
-      ).join('');
+        </li>`;
+      }).join('');
     }
 
     /* ==========================
@@ -1452,6 +1618,321 @@
       // Auto-refresh every 2 mins
       refreshTimer = setInterval(loadData, REFRESH_INTERVAL);
     }
+
+    /* ==========================
+       DETAIL PAGE
+    ========================== */
+    let currentDetailMarket = null;
+    let priceChart = null;
+
+    function showDetail(idx) {
+      const m = allMarkets[idx];
+      if (!m) return;
+      currentDetailMarket = m;
+      const overlay = document.getElementById('detailOverlay');
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      renderDetailContent(m);
+    }
+
+    function closeDetail() {
+      document.getElementById('detailOverlay').classList.remove('active');
+      document.body.style.overflow = '';
+      currentDetailMarket = null;
+      if (priceChart) { priceChart = null; }
+    }
+
+    function renderDetailContent(m) {
+      const panel = document.getElementById('detailPanel');
+      const cn = translateQuestion(m.question);
+      const probPct = (m.yesPrice * 100).toFixed(1);
+      const probColor = getProbColor(m.yesPrice);
+
+      panel.innerHTML = `
+        <button class="detail-back" onclick="closeDetail()">← 返回市场列表</button>
+
+        <div class="detail-header">
+          ${m.image ? `<img class="detail-img" src="${m.image}" alt="" onerror="this.style.display='none'">` : ''}
+          <div class="detail-info">
+            <div class="detail-title-cn">${cn || m.question}</div>
+            ${cn ? `<div class="detail-title-en">${m.question}</div>` : ''}
+            <div class="detail-meta">
+              <div class="detail-badge">
+                <span class="label">YES 概率</span>
+                <span class="val" style="color:${probColor}">${probPct}%</span>
+              </div>
+              <div class="detail-badge">
+                <span class="label">24h 成交</span>
+                <span class="val cyan">${formatVol(m.volume24hr)}</span>
+              </div>
+              <div class="detail-badge">
+                <span class="label">24h 变化</span>
+                <span class="val">${formatDelta(m.oneDayPriceChange)}</span>
+              </div>
+              <div class="detail-badge">
+                <span class="label">1h 变化</span>
+                <span class="val">${formatDelta(m.oneHourPriceChange)}</span>
+              </div>
+              <div class="detail-badge">
+                <span class="label">情绪分</span>
+                <span class="val">${renderScoreBadge(m.sentimentScore)}</span>
+              </div>
+              <div class="detail-badge">
+                <span class="label">类别</span>
+                <span class="val" style="font-size:12px">${m.category}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Chart -->
+        <div class="detail-section">
+          <div class="detail-section-title">📈 价格走势</div>
+          <div class="chart-interval-btns" id="chartIntervalBtns">
+            <button onclick="loadPriceChart('1d')" data-iv="1d">1天</button>
+            <button onclick="loadPriceChart('1w')" class="active" data-iv="1w">1周</button>
+            <button onclick="loadPriceChart('1m')" data-iv="1m">1月</button>
+            <button onclick="loadPriceChart('all')" data-iv="all">全部</button>
+          </div>
+          <div class="chart-container" id="priceChartContainer">
+            <div class="detail-loading">加载中…</div>
+          </div>
+        </div>
+
+        <!-- Order Book -->
+        <div class="detail-section">
+          <div class="detail-section-title">📊 订单簿 (CLOB)</div>
+          <div id="orderbookContent">
+            <div class="detail-loading">加载中…</div>
+          </div>
+        </div>
+
+        <!-- Description -->
+        ${m.description ? `
+        <div class="detail-section">
+          <div class="detail-section-title">📝 市场详情</div>
+          <div class="detail-desc">${m.description.replace(/\n/g, '<br>')}</div>
+        </div>` : ''}
+
+        <!-- Actions -->
+        <div class="detail-actions">
+          <a href="${m.url}" target="_blank" class="detail-btn primary">🚀 在 Polymarket 交易</a>
+          <a href="https://x.com/search?q=${encodeURIComponent(m.question.split(' ').slice(0,5).join(' '))}" target="_blank" class="detail-btn secondary">𝕏 搜索讨论</a>
+        </div>
+      `;
+
+      // Load CLOB data
+      loadOrderBook(m);
+      loadPriceChart('1w');
+    }
+
+    /* Order Book */
+    async function loadOrderBook(m) {
+      const container = document.getElementById('orderbookContent');
+      if (!m.clobTokenIds || m.clobTokenIds.length === 0) {
+        container.innerHTML = '<div class="detail-loading">暂无订单簿数据</div>';
+        return;
+      }
+
+      try {
+        const tokenId = m.clobTokenIds[0];
+        const url = GAMMA_PROXY + encodeURIComponent(`${CLOB_BASE}/book?token_id=${tokenId}`);
+        const res = await fetch(url);
+        const book = await res.json();
+
+        const bids = (book.bids || []).slice(0, 10);
+        const asks = (book.asks || []).slice(0, 10);
+
+        const maxBidSize = Math.max(...bids.map(b => parseFloat(b.size)), 1);
+        const maxAskSize = Math.max(...asks.map(a => parseFloat(a.size)), 1);
+
+        const formatSize = (s) => {
+          const n = parseFloat(s);
+          if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
+          if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
+          return n.toFixed(0);
+        };
+
+        const bidHtml = bids.map(b => {
+          const pct = (parseFloat(b.size) / maxBidSize * 100).toFixed(0);
+          return `<div class="ob-row bid">
+            <div class="ob-bar" style="width:${pct}%"></div>
+            <span class="ob-price">$${parseFloat(b.price).toFixed(3)}</span>
+            <span class="ob-size">${formatSize(b.size)}</span>
+          </div>`;
+        }).join('');
+
+        const askHtml = asks.map(a => {
+          const pct = (parseFloat(a.size) / maxAskSize * 100).toFixed(0);
+          return `<div class="ob-row ask">
+            <div class="ob-bar" style="width:${pct}%"></div>
+            <span class="ob-price">$${parseFloat(a.price).toFixed(3)}</span>
+            <span class="ob-size">${formatSize(a.size)}</span>
+          </div>`;
+        }).join('');
+
+        const spread = asks.length && bids.length
+          ? (parseFloat(asks[0].price) - parseFloat(bids[bids.length > 0 ? 0 : 0].price)).toFixed(4)
+          : '—';
+
+        container.innerHTML = `
+          <div style="text-align:center;margin-bottom:12px;font-size:12px;color:var(--text-secondary);">
+            Tick Size: ${book.tick_size || '—'} · Spread: $${spread} · Last Trade: $${book.last_trade_price || '—'}
+          </div>
+          <div class="orderbook-grid">
+            <div>
+              <div class="ob-side-title bids">✅ 买单 (Bids) ${bids.length ? '' : '- 暂无'}</div>
+              ${bidHtml || '<div style="color:var(--text-secondary);font-size:12px;">No bids</div>'}
+            </div>
+            <div>
+              <div class="ob-side-title asks">❌ 卖单 (Asks) ${asks.length ? '' : '- 暂无'}</div>
+              ${askHtml || '<div style="color:var(--text-secondary);font-size:12px;">No asks</div>'}
+            </div>
+          </div>
+        `;
+      } catch (err) {
+        console.error('Order book error:', err);
+        container.innerHTML = `<div class="detail-loading">ℹ️ 订单簿加载失败: ${err.message}</div>`;
+      }
+    }
+
+    /* Price History Chart */
+    async function loadPriceChart(interval) {
+      const m = currentDetailMarket;
+      if (!m || !m.clobTokenIds || m.clobTokenIds.length === 0) return;
+
+      // Update active button
+      document.querySelectorAll('#chartIntervalBtns button').forEach(b => {
+        b.classList.toggle('active', b.dataset.iv === interval);
+      });
+
+      const container = document.getElementById('priceChartContainer');
+      container.innerHTML = '<div class="detail-loading">加载中…</div>';
+
+      try {
+        const tokenId = m.clobTokenIds[0];
+        const fidelity = interval === '1d' ? 5 : interval === '1w' ? 30 : interval === '1m' ? 60 : 360;
+        const url = GAMMA_PROXY + encodeURIComponent(
+          `${CLOB_BASE}/prices-history?market=${tokenId}&interval=${interval}&fidelity=${fidelity}`
+        );
+        const res = await fetch(url);
+        const data = await res.json();
+        const history = data.history || [];
+
+        if (history.length < 2) {
+          container.innerHTML = '<div class="detail-loading">暂无足够的历史数据</div>';
+          return;
+        }
+
+        // Draw canvas chart
+        container.innerHTML = '<canvas id="priceCanvas"></canvas>';
+        drawPriceChart(history);
+      } catch (err) {
+        console.error('Price chart error:', err);
+        container.innerHTML = `<div class="detail-loading">图表加载失败: ${err.message}</div>`;
+      }
+    }
+
+    function drawPriceChart(history) {
+      const canvas = document.getElementById('priceCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const rect = canvas.parentElement.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      canvas.style.width = rect.width + 'px';
+      canvas.style.height = rect.height + 'px';
+      ctx.scale(dpr, dpr);
+
+      const W = rect.width;
+      const H = rect.height;
+      const pad = { top: 20, right: 60, bottom: 30, left: 10 };
+      const cw = W - pad.left - pad.right;
+      const ch = H - pad.top - pad.bottom;
+
+      const prices = history.map(h => h.p);
+      const times = history.map(h => h.t);
+      let minP = Math.min(...prices);
+      let maxP = Math.max(...prices);
+      const range = maxP - minP || 0.01;
+      minP -= range * 0.05;
+      maxP += range * 0.05;
+
+      const x = (i) => pad.left + (i / (history.length - 1)) * cw;
+      const y = (p) => pad.top + ch - ((p - minP) / (maxP - minP)) * ch;
+
+      // Gradient fill
+      const isUp = prices[prices.length - 1] >= prices[0];
+      const lineColor = isUp ? '#10b981' : '#ef4444';
+      const grad = ctx.createLinearGradient(0, pad.top, 0, H - pad.bottom);
+      grad.addColorStop(0, isUp ? 'rgba(16,185,129,0.25)' : 'rgba(239,68,68,0.25)');
+      grad.addColorStop(1, 'rgba(0,0,0,0)');
+
+      // Fill area
+      ctx.beginPath();
+      ctx.moveTo(x(0), y(prices[0]));
+      for (let i = 1; i < prices.length; i++) ctx.lineTo(x(i), y(prices[i]));
+      ctx.lineTo(x(prices.length - 1), H - pad.bottom);
+      ctx.lineTo(x(0), H - pad.bottom);
+      ctx.closePath();
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      // Draw line
+      ctx.beginPath();
+      ctx.moveTo(x(0), y(prices[0]));
+      for (let i = 1; i < prices.length; i++) ctx.lineTo(x(i), y(prices[i]));
+      ctx.strokeStyle = lineColor;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Y-axis labels
+      ctx.fillStyle = '#8888aa';
+      ctx.font = '10px Inter, sans-serif';
+      ctx.textAlign = 'left';
+      const ySteps = 5;
+      for (let i = 0; i <= ySteps; i++) {
+        const pv = minP + (maxP - minP) * (i / ySteps);
+        const yy = y(pv);
+        ctx.fillText((pv * 100).toFixed(1) + '%', W - pad.right + 8, yy + 4);
+        // Grid line
+        ctx.strokeStyle = 'rgba(255,255,255,0.04)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, yy);
+        ctx.lineTo(W - pad.right, yy);
+        ctx.stroke();
+      }
+
+      // X-axis labels
+      const xSteps = Math.min(5, history.length - 1);
+      ctx.textAlign = 'center';
+      for (let i = 0; i <= xSteps; i++) {
+        const idx = Math.floor(i * (history.length - 1) / xSteps);
+        const d = new Date(times[idx] * 1000);
+        const label = `${d.getMonth()+1}/${d.getDate()}`;
+        ctx.fillText(label, x(idx), H - 8);
+      }
+
+      // Current price dot
+      const lastP = prices[prices.length - 1];
+      const lx = x(prices.length - 1);
+      const ly = y(lastP);
+      ctx.beginPath();
+      ctx.arc(lx, ly, 4, 0, Math.PI * 2);
+      ctx.fillStyle = lineColor;
+      ctx.fill();
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+    // Close on ESC or overlay click
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDetail(); });
+    document.getElementById('detailOverlay').addEventListener('click', e => {
+      if (e.target === document.getElementById('detailOverlay')) closeDetail();
+    });
 
     init();
   </script>
